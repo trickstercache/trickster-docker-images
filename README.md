@@ -9,3 +9,29 @@ To build images, checkout the project locally, switch to a supported version bra
 Once the Dockerfile is prepared, you can run `docker build -f ./alpine/Dockerfile -t your:tag .` to create a Docker image for the prepared version. If the provided version does not have released binaries, then you will not be able to successfully build an image.
 
 Maintainers, once satisfied with the image quality, can tag the newly prepared Dockerfile with a proper semantic version, and push the tag to trigger an automated build/push to Docker Hub. The automated process will publish `linux/amd64` and `linux/arm64` images into the same tag.
+
+Example usage:
+
+```bash
+$ git clone https://github.com/tricksterproxy/trickster-docker-images.git
+$ cd trickster-docker-images
+
+$ export VERSION=1.1.0
+$ export BRANCH=v1.1.x
+
+$ git checkout $BRANCH
+
+$ ./prepare_versioned_release $VERSION
+
+  Alpine Dockerfile is ready at ./alpine/Dockerfile
+
+  Now build docker images locally or maintainers can tag/push to trigger a release build.
+
+$ docker build -f ./alpine/Dockerfile -t image-name:image-tag .
+
+# Maintainers
+
+$ git commit -m "prepare version $VERSION" ./alpine/Dockerfile
+$ git tag "v${VERSION}"
+$ git push origin $BRANCH
+```
