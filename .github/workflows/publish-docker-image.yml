@@ -55,8 +55,10 @@ jobs:
             --push \
             -f ./alpine/Dockerfile \
             -t ${{ env.BUILDER_TAG }} . &&
+          docker pull ${{ env.BUILDER_TAG }} &&
           docker tag ${{ env.BUILDER_TAG }} ${{ env.IO_TAG }} &&
           docker push ${{ env.IO_TAG }}
         env:
           BUILDER_TAG: tricksterproxy/trickster:testing-${{ steps.baretag.outputs.baretag }}
           IO_TAG: tricksterio/trickster:testing-${{ steps.baretag.outputs.baretag }}
+        
