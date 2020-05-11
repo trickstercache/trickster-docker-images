@@ -62,7 +62,7 @@ jobs:
             --platform linux/arm64/v8,linux/amd64 \
             --push \
             -f ./alpine/Dockerfile \
-            -t ${{ env.IO_TAG }} . &&
+            -t ${{ env.IO_TAG }} .
         env:
           PROXY_TAG: tricksterproxy/trickster:${{ steps.baretag.outputs.baretag }}
           IO_TAG: tricksterio/trickster:${{ steps.baretag.outputs.baretag }}
