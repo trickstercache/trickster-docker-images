@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Get Release Version
         id: baretag
-        run: echo "::set-output name=baretag::$(echo ${{ github.ref }} | cut -b 13-)"
+        run: echo "::set-output name=baretag::$(echo ${{ github.ref }} | cut -b 12-)"
         #
       - name: Get Build Date
         id: builddate
