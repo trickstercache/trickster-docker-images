@@ -21,7 +21,7 @@ $ export BRANCH=v1.1.x
 
 $ git checkout $BRANCH
 
-$ ./prepare_versioned_release $VERSION
+$ ./prepare_versioned_release.sh $VERSION
 
   Alpine Dockerfile is ready at ./alpine/Dockerfile
 
