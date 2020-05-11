@@ -52,7 +52,7 @@ jobs:
             --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
             --label "org.opencontainers.image.created=${{ steps.builddate.outputs.builddate }}" \
             --platform linux/arm64/v8,linux/amd64 \
-            --output "type=image,push=false" \
+            --output=type=docker \
             -f ./alpine/Dockerfile \
             -t ${{ env.BUILDER_TAG }} . &&
           # docker tag ${{ env.BUILDER_TAG }} ${{ env.IO_TAG }} &&
