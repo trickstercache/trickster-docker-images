@@ -52,11 +52,11 @@ jobs:
             --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
             --label "org.opencontainers.image.created=${{ steps.builddate.outputs.builddate }}" \
             --platform linux/arm64/v8,linux/amd64 \
-            -t ${{ BUILDER_TAG }} . &&
-          # docker tag ${{ BUILDER_TAG }} ${{ IO_TAG }} &&
-          # docker push ${{ IO_TAG }} &&
-          docker tag ${{ BUILDER_TAG }} ${{ PROXY_TAG }} &&
-          docker push ${{ PROXY_TAG }}
+            -t ${{ env.BUILDER_TAG }} . &&
+          # docker tag ${{ env.BUILDER_TAG }} ${{ env.IO_TAG }} &&
+          # docker push ${{ env.IO_TAG }} &&
+          docker tag ${{ env.BUILDER_TAG }} ${{ env.PROXY_TAG }} &&
+          docker push ${{ env.PROXY_TAG }}
         env:
           BUILDER_TAG: trickster-builder:${{ steps.baretag.outputs.baretag }}
           IO_TAG: tricksterio/trickster:${{ steps.baretag.outputs.baretag }}
