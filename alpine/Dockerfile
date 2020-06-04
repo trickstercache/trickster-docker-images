@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM alpine:3.11
+FROM alpine:3.12
 RUN apk --no-cache add ca-certificates tzdata
 RUN set -ex; \
 	apkArch="$(apk --print-arch)"; \
@@ -21,11 +21,11 @@ RUN set -ex; \
 		*) echo >&2 "error: unsupported architecture: $apkArch"; exit 1 ;; \
 	esac; \
    	cd /tmp && \
-	wget --quiet -O ./trickster.tar.gz "https://github.com/tricksterproxy/trickster/releases/download/v1.1.0/trickster-1.1.0.tar.gz" && \
+	wget --quiet -O ./trickster.tar.gz "https://github.com/tricksterproxy/trickster/releases/download/v1.1.1/trickster-1.1.1.tar.gz" && \
     tar zvxf ./trickster.tar.gz && \
     mkdir -p /etc/trickster && \
-    mv ./trickster-1.1.0/bin/trickster-1.1.0.linux-${arch} /usr/local/bin/trickster && \
-    mv ./trickster-1.1.0/conf/example.conf /etc/trickster/trickster.conf && \
+    mv ./trickster-1.1.1/bin/trickster-1.1.1.linux-${arch} /usr/local/bin/trickster && \
+    mv ./trickster-1.1.1/conf/example.conf /etc/trickster/trickster.conf && \
 	rm -rf ./trickster* && \
     chown nobody /usr/local/bin/trickster && \
 	chmod +x /usr/local/bin/trickster
@@ -44,5 +44,5 @@ LABEL maintainer "The Trickster Authors <trickster-developers@googlegroups.com>"
 	org.opencontainers.image.url="https://tricksterproxy.io" \
 	org.opencontainers.image.title="Trickster" \
 	org.opencontainers.image.description="an HTTP Reverse Proxy Cache and time series dashboard accelerator" \
-	org.opencontainers.image.version="1.1.0" \
+	org.opencontainers.image.version="1.1.1" \
 	org.opencontainers.image.documentation="https://github.com/tricksterproxy/trickster/tree/master/docs"
