@@ -25,7 +25,7 @@ RUN set -ex; \
     tar zvxf ./trickster.tar.gz && \
     mkdir -p /etc/trickster && \
     mv ./trickster-${VERSION}/bin/trickster-${VERSION}.linux-${arch} /usr/local/bin/trickster && \
-    mv ./trickster-${VERSION}/conf/example.conf /etc/trickster/trickster.conf && \
+    mv ./trickster-${VERSION}/conf/example.full.yaml /etc/trickster/trickster.yaml && \
 	rm -rf ./trickster* && \
     chown nobody /usr/local/bin/trickster && \
 	chmod +x /usr/local/bin/trickster
@@ -45,4 +45,4 @@ LABEL maintainer "The Trickster Authors <trickster-developers@googlegroups.com>"
 	org.opencontainers.image.title="Trickster" \
 	org.opencontainers.image.description="an HTTP Reverse Proxy Cache and time series dashboard accelerator" \
 	org.opencontainers.image.version="$VERSION" \
-	org.opencontainers.image.documentation="https://github.com/tricksterproxy/trickster/tree/master/docs"
+	org.opencontainers.image.documentation="https://github.com/tricksterproxy/trickster/tree/main/docs"

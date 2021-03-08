@@ -21,11 +21,11 @@ RUN set -ex; \
 		*) echo >&2 "error: unsupported architecture: $apkArch"; exit 1 ;; \
 	esac; \
    	cd /tmp && \
-	wget --quiet -O ./trickster.tar.gz "https://github.com/tricksterproxy/trickster/releases/download/v1.1.2/trickster-1.1.2.tar.gz" && \
+	wget --quiet -O ./trickster.tar.gz "https://github.com/tricksterproxy/trickster/releases/download/v2.0.0-beta1/trickster-2.0.0-beta1.tar.gz" && \
     tar zvxf ./trickster.tar.gz && \
     mkdir -p /etc/trickster && \
-    mv ./trickster-1.1.2/bin/trickster-1.1.2.linux-${arch} /usr/local/bin/trickster && \
-    mv ./trickster-1.1.2/conf/example.conf /etc/trickster/trickster.conf && \
+    mv ./trickster-2.0.0-beta1/bin/trickster-2.0.0-beta1.linux-${arch} /usr/local/bin/trickster && \
+    mv ./trickster-2.0.0-beta1/conf/example.full.yaml /etc/trickster/trickster.yaml && \
 	rm -rf ./trickster* && \
     chown nobody /usr/local/bin/trickster && \
 	chmod +x /usr/local/bin/trickster
@@ -44,5 +44,5 @@ LABEL maintainer "The Trickster Authors <trickster-developers@googlegroups.com>"
 	org.opencontainers.image.url="https://tricksterproxy.io" \
 	org.opencontainers.image.title="Trickster" \
 	org.opencontainers.image.description="an HTTP Reverse Proxy Cache and time series dashboard accelerator" \
-	org.opencontainers.image.version="1.1.2" \
-	org.opencontainers.image.documentation="https://github.com/tricksterproxy/trickster/tree/master/docs"
+	org.opencontainers.image.version="2.0.0-beta1" \
+	org.opencontainers.image.documentation="https://github.com/tricksterproxy/trickster/tree/main/docs"
