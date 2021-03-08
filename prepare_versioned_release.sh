@@ -26,9 +26,9 @@ fi
 
 if [ $# -eq 0 ] ; then
     echo
-    echo "Usage:     ./release_trickster_image.sh \$VERSION"
+    echo "Usage:     ./prepare_versioned_release.sh \$VERSION"
     echo
-    echo "Example:   ./release_trickster_image.sh 1.1.0"
+    echo "Example:   ./prepare_versioned_release.sh 1.1.0"
     echo
     echo "Version Examples:  1.1.0   1.1.0-beta1   1.1.0-rc12   1.1.0-alpha98"
     echo
