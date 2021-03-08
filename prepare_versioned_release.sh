@@ -66,7 +66,7 @@ if [[ "$BRANCH" != "$EXPECTED_BRANCH" ]] ; then
     exit 1
 fi
 
-export ALPINE_VERSION=3.12
+export ALPINE_VERSION=3.13
 echo "${VERSION}" > version
 
 WORKING_DIR="$(cd "$(dirname "$0")" && pwd -P)"
