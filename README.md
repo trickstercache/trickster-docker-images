@@ -4,34 +4,21 @@ This project maintains and publishes the Dockerfile for Trickster. The GitHub ac
 
 You can access the images pushed by this repo on Docker Hub at <https://hub.docker.com/r/tricksterproxy/trickster>.
 
-To build images, checkout the project locally, switch to a supported version branch (currently `v1.1.x`) and run `./prepare_versioned_release.sh <NEW_VERSION_NUMBER>`. The version number argument must be in the proper semantic versioning format, which is well-defined in the script output, and must correspond to a matching release tag in the [main Trickster project](https://github.com/tricksterproxy/trickster/releases), which houses the built release binaries downloaded by the builder.
+This repository maintains a docker image for the major supported trickster versions -- v1 and v2.
 
-Once the Dockerfile is prepared, you can run `docker build -f ./alpine/Dockerfile -t your:tag .` to create a Docker image for the prepared version. If the provided version does not have released binaries, then you will not be able to successfully build an image.
+## Building an image
 
-Maintainers, once satisfied with the image quality, can tag the newly prepared Dockerfile with a proper semantic version, and push the tag to trigger an automated build/push to Docker Hub. The automated process will publish `linux/amd64` and `linux/arm64` images into the same tag.
+1. First, identify the corresponding Dockerfile:
 
-Example usage:
+- alpine/Dockerfile.v1x -- installs the last promoted v1 trickster release
+- alpine/Dockerfile.v2x -- installs the last promoted v2 trickster release
 
-```bash
-$ git clone https://github.com/tricksterproxy/trickster-docker-images.git
-$ cd trickster-docker-images
+2. Modify the image. Once the Dockerfile is prepared, you can run `docker build --build-arg TRICKSTER_VERSION=2.3.4 -f ./alpine/Dockerfile.v2x -t your:tag .` to create a Docker image for the prepared version to test locally.
 
-$ export VERSION=1.1.0
-$ export BRANCH=v1.1.x
+If the provided version does not have released binaries, then you will not be able to successfully build an image.
 
-$ git checkout $BRANCH
+3. Once the changes are merged to main, the images are pushed to Docker Hub
 
-$ ./prepare_versioned_release.sh $VERSION
+### Updating the Trickster version
 
-  Alpine Dockerfile is ready at ./alpine/Dockerfile
-
-  Now build docker images locally or maintainers can tag/push to trigger a release build.
-
-$ docker build -f ./alpine/Dockerfile -t image-name:image-tag .
-
-# Maintainers
-
-$ git commit -m "prepare version $VERSION" ./alpine/Dockerfile
-$ git tag "v${VERSION}"
-$ git push origin $BRANCH
-```
+Unless there is a change to the Dockerfile, trickster application version updates are managed by modifying the `versions.yaml` file at the root of the repository.

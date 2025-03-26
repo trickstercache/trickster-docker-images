@@ -1,0 +1,104 @@
+# Copyright 2025 The Trickster Authors
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+name: Publish Trickster Docker Images
+
+jobs:
+  build:
+    name: Publish Beta Release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        major_version:
+          - v2x
+          - v1x
+    steps:
+      - name: Get Build Date
+        id: builddate
+        run: echo "::set-output name=builddate::$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        #
+      - name: Checkout code
+        uses: actions/checkout@v2
+        #
+        # Scan Dockerfile(s) for security issues
+      - name: Run Checkov action
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: alpine
+          framework: dockerfile
+          config_file: checkov.yaml
+        #
+        # Set up docker
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        # 
+      - name: check if version exists
+        id: check_version
+        run: |
+          version=$(yq '.${{ matrix.major_version }}' versions.yaml -r)
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+      - name: check if image exists
+        if: github.event_name != 'pull_request'
+        id: check_image
+        env:
+          version: ${{ steps.check_version.outputs.version }}
+        run: |
+          if docker pull tricksterproxy/trickster:${{ env.version }} &> /dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: build & push ${{ matrix.major_version }} image
+        if: github.event_name == 'pull_request' || steps.check_image.outputs.exists == 'false'
+        run: |
+          docker buildx build \
+            --label "org.opencontainers.image.revision=${{ github.sha }}" \
+            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            --label "org.opencontainers.image.created=${{ steps.builddate.outputs.builddate }}" \
+            --platform linux/arm64/v8,linux/amd64 \
+            --push=${{ env.PUSH_ENABLED }} \
+            --build-arg TRICKSTER_VERSION=${{ steps.check_version.outputs.version }} \
+            -f ./alpine/Dockerfile.${{ matrix.major_version }} \
+            -t ${{ env.PROXY_TAG }} \
+            -t ${{ env.IO_TAG }} .
+        env:
+          PUSH_ENABLED: ${{ github.event_name == 'pull_request' && 'false' || 'true' }}
+          PROXY_TAG: tricksterproxy/trickster:${{ steps.check_version.outputs.version }}
+          IO_TAG: tricksterio/trickster:${{ steps.check_version.outputs.version }}
+      - name: Scan image
+        id: scan
+        uses: anchore/scan-action@v6
+        continue-on-error: true # TODO: remove this line once the images are clean
+        with:
+          image: tricksterproxy/trickster:${{ steps.check_version.outputs.version }}
+          cache-db: true
+      - name: upload Anchore scan SARIF report
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+      - run: cat ${{ steps.scan.outputs.sarif }}

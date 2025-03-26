@@ -1,4 +1,4 @@
-# Copyright 2018 Comcast Cable Communications Management, LLC
+# Copyright 2025 The Trickster Authors
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,6 +12,7 @@
 # limitations under the License.
 
 FROM alpine:3.12
+ARG TRICKSTER_VERSION=1.1.5
 RUN apk --no-cache add ca-certificates tzdata
 RUN set -ex; \
 	apkArch="$(apk --print-arch)"; \
@@ -21,11 +22,11 @@ RUN set -ex; \
 		*) echo >&2 "error: unsupported architecture: $apkArch"; exit 1 ;; \
 	esac; \
    	cd /tmp && \
-	wget --quiet -O ./trickster.tar.gz "https://github.com/tricksterproxy/trickster/releases/download/v1.1.2/trickster-1.1.2.tar.gz" && \
+	wget --quiet -O ./trickster.tar.gz "https://github.com/tricksterproxy/trickster/releases/download/v${TRICKSTER_VERSION}/trickster-${TRICKSTER_VERSION}.tar.gz" && \
     tar zvxf ./trickster.tar.gz && \
     mkdir -p /etc/trickster && \
-    mv ./trickster-1.1.2/bin/trickster-1.1.2.linux-${arch} /usr/local/bin/trickster && \
-    mv ./trickster-1.1.2/conf/example.conf /etc/trickster/trickster.conf && \
+    mv ./trickster-${TRICKSTER_VERSION}/bin/trickster-${TRICKSTER_VERSION}.linux-${arch} /usr/local/bin/trickster && \
+    mv ./trickster-${TRICKSTER_VERSION}/conf/example.conf /etc/trickster/trickster.conf && \
 	rm -rf ./trickster* && \
     chown nobody /usr/local/bin/trickster && \
 	chmod +x /usr/local/bin/trickster
@@ -40,9 +41,9 @@ ENTRYPOINT ["trickster"]
 
 # Metadata
 LABEL maintainer "The Trickster Authors <trickster-developers@googlegroups.com>" \
-    org.opencontainers.image.vendor="Comcast Corporation" \
+    org.opencontainers.image.vendor="Trickster Authors" \
 	org.opencontainers.image.url="https://tricksterproxy.io" \
 	org.opencontainers.image.title="Trickster" \
 	org.opencontainers.image.description="an HTTP Reverse Proxy Cache and time series dashboard accelerator" \
-	org.opencontainers.image.version="1.1.2" \
+	org.opencontainers.image.version="${TRICKSTER_VERSION}" \
 	org.opencontainers.image.documentation="https://github.com/tricksterproxy/trickster/tree/master/docs"
