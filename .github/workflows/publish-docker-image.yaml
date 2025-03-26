@@ -25,9 +25,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        major_version:
-          - v2x
-          - v1x
+        options:
+          - |
+            {"major_version": "v2x", "flavor": "distroless", "tag-suffix":"-slim"}
+          - |
+            {"major_version": "v2x", "flavor": "alpine", "tag-suffix":""}
+          - |
+            {"major_version": "v1x", "flavor": "alpine", "tag-suffix":""}
     steps:
       - name: Get Build Date
         id: builddate
@@ -60,7 +64,7 @@ jobs:
       - name: check if version exists
         id: check_version
         run: |
-          version=$(yq '.${{ matrix.major_version }}' versions.yaml -r)
+          version=$(yq '.${{ fromJson(matrix.options).major_version }}' versions.yaml -r)
           echo "version=${version}" >> "$GITHUB_OUTPUT"
       - name: check if image exists
         if: github.event_name != 'pull_request'
@@ -73,7 +77,7 @@ jobs:
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
-      - name: build & push ${{ matrix.major_version }} image
+      - name: build & push ${{ fromJson(matrix.options).major_version }} image
         if: github.event_name == 'pull_request' || steps.check_image.outputs.exists == 'false'
         run: |
           docker buildx build \
@@ -83,13 +87,14 @@ jobs:
             --platform linux/arm64/v8,linux/amd64 \
             --push=${{ env.PUSH_ENABLED }} \
             --build-arg TRICKSTER_VERSION=${{ steps.check_version.outputs.version }} \
-            -f ./alpine/Dockerfile.${{ matrix.major_version }} \
+            -f ./${{ fromJson(matrix.options).flavor }}/Dockerfile.${{ env.MAJOR_VERSION }} \
             -t ${{ env.PROXY_TAG }} \
             -t ${{ env.IO_TAG }} .
         env:
           PUSH_ENABLED: ${{ github.event_name == 'pull_request' && 'false' || 'true' }}
-          PROXY_TAG: tricksterproxy/trickster:${{ steps.check_version.outputs.version }}
-          IO_TAG: tricksterio/trickster:${{ steps.check_version.outputs.version }}
+          PROXY_TAG: tricksterproxy/trickster:${{ steps.check_version.outputs.version }}${{ fromJson(matrix.options).tag-suffix }}
+          IO_TAG: tricksterio/trickster:${{ steps.check_version.outputs.version }}${{ fromJson(matrix.options).tag-suffix }}
+          MAJOR_VERSION: ${{ fromJson(matrix.options).major_version }}
       - name: Scan image
         id: scan
         uses: anchore/scan-action@v6
