@@ -11,8 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM alpine:3.13
-ARG TRICKSTER_VERSION=4.5.6
+ARG BASE_DISTROLESS_VERSION=latest
+FROM alpine:3.21 as builder
+ARG TRICKSTER_VERSION=2.0.0-beta2
+
 RUN apk --no-cache add ca-certificates tzdata
 RUN set -ex; \
 	apkArch="$(apk --print-arch)"; \
@@ -31,13 +33,18 @@ RUN set -ex; \
     chown nobody /usr/local/bin/trickster && \
 	chmod +x /usr/local/bin/trickster
 
+FROM ghcr.io/distroless/static:${BASE_DISTROLESS_VERSION} as final
+
+COPY --from=builder /usr/local/bin/trickster /trickster
+COPY --from=builder /etc/trickster /etc/trickster
+
 EXPOSE 8480
 EXPOSE 8481
 EXPOSE 8483
 EXPOSE 8484
 
 USER nobody
-ENTRYPOINT ["trickster"]
+ENTRYPOINT ["/trickster"]
 
 # Metadata
 LABEL maintainer "The Trickster Authors <trickster-developers@googlegroups.com>" \
