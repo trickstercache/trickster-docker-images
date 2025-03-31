@@ -1,3 +1,7 @@
+# NOTE
+
+We have relocated the Trickster Dockerfile and Docker image publishing pipeline into the the [main Trickster project](https://github.com/trickstercache/trickster). This project is archived, unsupported and may not work anymore.
+
 # Trickster Docker Images
 
 This project maintains and publishes the Dockerfile for Trickster. The GitHub actions in this project build and publish images to Docker Hub via GitHub Actions.
